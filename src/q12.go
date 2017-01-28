@@ -37,10 +37,6 @@ func main() {
 	}
 	defer wfp.Close()
 
-	
-	// output := []byte("aaaa")
-	// wfp.Write(output)
-
 	var count int = 1
 	var word []rune		
 	for {
