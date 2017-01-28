@@ -1,56 +1,67 @@
 package main
 
 import (
-	"fmt"
 	"os"
 	"bufio"
 	"log"
 	"strconv"
+	"path/filepath"
 )
 
 const (
 	NULL rune = 0
 )
 
-func main()  {
-	if len(os.Args) != 3 {
-		log.Fatal("Please input filename as a first standard input and row number you want to extract as a second.")
-	} else {
-		fp, err := os.Open(os.Args[1])
-		if err != nil {
-			log.Fatal(err)
+func main() {
+	// read file
+	rfp, err := os.Open(os.Args[1])
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rfp.Close()
+
+	reader := bufio.NewReaderSize(rfp, 4096)
+
+	// 抜き出したい列
+	col, err := strconv.Atoi(os.Args[2])
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// write file
+	dir, _ := filepath.Split(os.Args[1])
+	filename := dir + "col" + strconv.Itoa(col) + ".txt"
+	wfp, err := os.Create(filename)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer wfp.Close()
+
+	
+	// output := []byte("aaaa")
+	// wfp.Write(output)
+
+	var count int = 1
+	var word []rune		
+	for {
+		p, _, _ := reader.ReadRune()
+		// ファイル終端ならループを抜ける
+		if p == NULL {
+			break
 		}
-		defer fp.Close()
 
-		reader := bufio.NewReaderSize(fp, 4096)
-
-		row, err := strconv.Atoi(os.Args[2])
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		var count int = 1
-		var word []rune		
-		for {
-			p, _, _ := reader.ReadRune()
-			// ファイル終端ならループを抜ける
-			if p == NULL {
-				break
-			}
-
-			if p == rune('\t') {
-				count++
-			} else if count == row {
-				word = append(word, p)
-			}
-			
-			if p == rune('\n') {
-				fmt.Printf("%v\n", string(word))
-				count = 1
-				word = nil
-			}
-
+		if p == rune('\t') {
+			count++
+		} else if count == col {
+			word = append(word, p)
 		}
 		
+		if p == rune('\n') {
+			wfp.Write([]byte(string(word)))
+			wfp.Write([]byte(string('\n')))
+			count = 1
+			word = nil
+		}
+
 	}
 }
