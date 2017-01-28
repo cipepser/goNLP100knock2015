@@ -32,7 +32,6 @@ func CountRow(filename string) (count int) {
 }
 
 func main() {
-	// read file
 	rfp, err := os.Open(os.Args[1])
 	if err != nil {
 		log.Fatal(err)
@@ -47,11 +46,16 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// write file
 	dir, _ := filepath.Split(os.Args[1])
-	wfp := make([]*os.File, N)
+	
+	nFile := row / N + 1
+	if row % N == 0 {
+		nFile--
+	}
+	
+	wfp := make([]*os.File, nFile)
 
-	for i := 0; i < N; i++ {
+	for i := 0; i < nFile; i++ {
 		filename := dir + "div" + strconv.Itoa(i) + ".txt"
 		wfp[i], err = os.Create(filename)
 		if err != nil {
@@ -60,10 +64,19 @@ func main() {
 		defer wfp[i].Close()
 	}
 	
-	for count := 0; count < row; count++ {
-		p, _, _ := reader.ReadLine()
-		
-		wfp[count / (row / N + 1)].Write(p)
-		wfp[count / (row / N + 1)].Write([]byte(string('\n')))
+	var i, count int
+	for {
+		p, _, err := reader.ReadLine()
+		if err == io.EOF {
+			break
+		}
+		count++
+
+		wfp[i].Write(p)
+		wfp[i].Write([]byte(string('\n')))
+
+		if count % N == 0 {
+			i++
+		}
 	}
 }
