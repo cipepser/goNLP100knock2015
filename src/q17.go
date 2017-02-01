@@ -40,7 +40,7 @@ func (p runeSlice) Swap(i, j int) {
 	 p[i], p[j] = p[j], p[i]
 }
 
-func String(R runeSlice) (s []string) {
+func String(R []rune) (s []string) {
 	for _, r := range R {
 		s = append(s, string(r))	
 	}
@@ -114,5 +114,7 @@ func main() {
 	words = Uniq(words)
 	
 	// 結果表示
-	fmt.Println(String(words))
+	for _, w := range words {
+		fmt.Println(String(w))	
+	}
 }
