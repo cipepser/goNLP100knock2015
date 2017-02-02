@@ -170,7 +170,7 @@ func main() {
 	// result
 	for _, r := range table {
 		fmt.Printf("%s\t", string(r.Pref))
-		fmt.Printf("%s\t", string(r.Pref))
+		fmt.Printf("%s\t", string(r.City))
 		fmt.Printf("%.1f\t", r.Temperature)
 		fmt.Printf("%s", string(r.Date))
 	}
