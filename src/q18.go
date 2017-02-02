@@ -169,7 +169,6 @@ func main() {
 	
 	// result
 	for _, r := range table {
-		// fmt.Println()
 		fmt.Printf("%s\t", string(r.Pref))
 		fmt.Printf("%s\t", string(r.Pref))
 		fmt.Printf("%.1f\t", r.Temperature)
