@@ -7,6 +7,7 @@ import (
 	"io"
 	"os"
 	"regexp"
+	"strings"
 )
 
 type Article struct {
@@ -45,17 +46,18 @@ func main() {
 	reg := regexp.MustCompile(`{{基礎情報 国[\s\S]*\n}}`)
 	txt = string(reg.FindAll([]byte(txt), -1)[0])
 
-	//
+	// フィールドごとに分ける
 	reg = regexp.MustCompile(`(?m)^\|[\s\S]*?\n\|`)
 
+	// Mapに格納
+	m := make(map[string]string)
 	for _, v := range reg.FindAll([]byte(txt), -1) {
-		// if string(v[0]) == "F" {
-		// 	fmt.Println(string(v[len("File:"): len(v) - 1]))
-		// } else {
-		// 	fmt.Println(string(v[len("ファイル:"): len(v) - 1]))
-		// }
-		fmt.Println(string(v[1: len(v) - 2]))
-		fmt.Println("---------------------")
+		s := string(v[1: len(v) - 2])
+		strs := strings.Split(s, " = ")
+		m[strs[0]] = strs[1]
 	}
-
+	
+	fmt.Println(m["略名"])
+	fmt.Println("------------------")
+	fmt.Println(m["公式国名"])
 }
