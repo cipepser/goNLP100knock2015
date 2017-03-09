@@ -45,7 +45,12 @@ func main() {
 	// 基本情報だけ抜き出し
 	reg := regexp.MustCompile(`{{基礎情報 国[\s\S]*\n}}`)
 	txt = string(reg.FindAll([]byte(txt), -1)[0])
-
+	txt = strings.Replace(txt, "{{基礎情報 国\n", "", 1)
+	
+	// 前処理
+	// `\n|`でマッチさせると偶数回目がfindできないため`|`をダブらせる
+	txt = strings.Replace(txt, "\n|", "\n|\n|", -1)
+	
 	// フィールドごとに分ける
 	reg = regexp.MustCompile(`(?m)^\|[\s\S]*?\n\|`)
 
@@ -60,4 +65,6 @@ func main() {
 	fmt.Println(m["略名"])
 	fmt.Println("------------------")
 	fmt.Println(m["公式国名"])
+	fmt.Println("------------------")
+	fmt.Println(m["確立形態4"])
 }
