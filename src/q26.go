@@ -50,6 +50,9 @@ func main() {
 	// 前処理
 	// `\n|`でマッチさせると偶数回目がfindできないため`|`をダブらせる
 	txt = strings.Replace(txt, "\n|", "\n|\n|", -1)
+
+	// 注記のあとには`\n|`がないので追加しておく
+	txt = strings.Replace(txt, "\n}}", "\n|}}", -1)
 	
 	// フィールドごとに分ける
 	reg = regexp.MustCompile(`(?m)^\|[\s\S]*?\n\|`)

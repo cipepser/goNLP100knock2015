@@ -50,6 +50,9 @@ func main() {
 	// 前処理
 	// `\n|`でマッチさせると偶数回目がfindできないため`|`をダブらせる
 	txt = strings.Replace(txt, "\n|", "\n|\n|", -1)
+
+	// 注記のあとには`\n|`がないので追加しておく
+	txt = strings.Replace(txt, "\n}}", "\n|}}", -1)
 	
 	// フィールドごとに分ける
 	reg = regexp.MustCompile(`(?m)^\|[\s\S]*?\n\|`)
@@ -67,4 +70,6 @@ func main() {
 	fmt.Println(m["公式国名"])
 	fmt.Println("------------------")
 	fmt.Println(m["確立形態4"])
+	fmt.Println("------------------")
+	fmt.Println(m["注記"])
 }
