@@ -79,6 +79,8 @@ func main() {
 				for i := 1; i < len(s); i++ {
 					res += s[i]
 				}
+				res = strings.Replace(res, "[[", "", -1)
+				res = strings.Replace(res, "]]", "", -1)
 				m[strs[0]] = res
 			}
 		} else if regInternalLink2.FindString(tmp) != "" {
@@ -87,15 +89,14 @@ func main() {
 				for i := 1; i < len(s); i++ {
 					res += s[i]
 				}
+				res = strings.Replace(res, "[[", "", -1)
+				res = strings.Replace(res, "]]", "", -1)
 				m[strs[0]] = res
 			}
 		} else {
-			res := []rune{}
-			for _, r := range []rune(tmp) {
-				if r != []rune("[")[0] && r != []rune("]")[0] {
-					res = append(res, r)
-				}
-			}
+			res := tmp
+			res = strings.Replace(res, "[[", "", -1)
+			res = strings.Replace(res, "]]", "", -1)
 			m[strs[0]] = string(res)
 		}
 	}
