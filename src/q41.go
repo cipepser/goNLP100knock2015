@@ -83,7 +83,6 @@ func main()  {
 	}
 	
 	// print the 8th sentence.
-	// fmt.Println(sents[7])
 	n := 7 // the sentence number we wanna print.
 	for _, chunk := range sents[n] {
 		for _, ms := range chunk.morphs {
