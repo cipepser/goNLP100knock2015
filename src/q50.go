@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	f, err := os.Open("../data/nlp_tmp.txt")
+	f, err := os.Open("../data/nlp.txt")
 	defer f.Close()
 	if err != nil {
 		panic(err)
@@ -17,12 +17,8 @@ func main() {
 
 	r := bufio.NewReader(f)
 
-	// (. or ; or : or ? or !) → 空白文字 → 英大文字というパターンを文の区切りと見なし，
-	// 入力された文書を1行1文の形式で出力せよ．
 	rTitle := regexp.MustCompile(`.+`)
-	// rSent := regexp.MustCompile(`.*(\.|;|:|\?|!)\s(A-Z)*`)
-	rSent := regexp.MustCompile(`.*?(\.|;|:|\?|!)\s(A-Z)*`)
-	// rSent := regexp.MustCompile(`(.*[\.;:?!])\s(A-Z)*`)
+	rSent := regexp.MustCompile(`.*?(\.|;|:|\?|!)\s[A-Z]{1}?`)
 
 	for {
 		l, _, err := r.ReadLine()
@@ -30,18 +26,19 @@ func main() {
 			break
 		}
 
-		// to capture the last sentence.
-		l = []byte(string(l) + "\n")
+		// add dummy character to capture the last sentence.
+		l = []byte(string(l) + " A")
 
-		// capture the sentecse
+		// capture the sentecse.
 		flg := false
-		for _, v := range rSent.FindAll(l, -1) {
-			fmt.Println("---------------")
-
-			// remove the LF
-			if string(v[len(v)-1]) == "\n" {
-				v = v[:len(v)-1]
+		var capital byte
+		for i, v := range rSent.FindAll(l, -1) {
+			if i != len(v)-1 {
+				v = append([]byte{capital}, v...)
+				capital = v[len(v)-1]
 			}
+			v = v[:len(v)-2]
+
 			fmt.Println(string(v))
 			flg = true
 		}
@@ -51,8 +48,8 @@ func main() {
 
 		// capture the title.
 		for _, v := range rTitle.FindAll(l, -1) {
-			fmt.Println("---------------")
-
+			// remove dummy character.
+			v = v[:len(v)-2]
 			fmt.Println(string(v))
 		}
 	}
