@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/xml"
-	"fmt"
 	"os"
 
 	"github.com/awalterschulze/gographviz"
@@ -162,7 +161,7 @@ func main() {
 	}
 
 	// sentence number you wanna draw the graph.
-	n := 0
+	n := 2
 	// draw the directed graph.
 	g := gographviz.NewGraph()
 	if err := g.SetName("G"); err != nil {
@@ -189,36 +188,29 @@ func main() {
 	edgeAttrs := make(map[string]string)
 	edgeAttrs["color"] = "white"
 
-	// for _, s := range r.Document.Sentences.Sentence {
+	// draw the graph
 	for _, d := range r.Document.Sentences.Sentence[n].Dependencies {
 		if d.AttrType == "collapsed-dependencies" {
-			// fmt.Println(d.AttrType)
 			for _, dep := range d.Dep {
-				fmt.Println(dep)
+				if err := g.AddNode("G", "\""+dep.Dependent.Text+"\"", nodeAttrs); err != nil {
+					panic(err)
+				}
+				if err := g.AddNode("G", "\""+dep.Governor.Text+"\"", nodeAttrs); err != nil {
+					panic(err)
+				}
+				if err := g.AddEdge("\""+dep.Dependent.Text+"\"", "\""+dep.Governor.Text+"\"", true, edgeAttrs); err != nil {
+					panic(err)
+				}
 			}
 
-			//
-			// if err := g.AddNode("G", ws, nodeAttrs); err != nil {
-			// 	panic(err)
-			// }
-			//
-			//
-			// if err := g.AddEdge(ws, wd, true, edgeAttrs); err != nil {
-			// 	panic(err)
-			//
-			// 	// output the dotfile.
-			// 	s := g.String()
-			// 	file, err := os.Create(`./q57.dot`)
-			// 	if err != nil {
-			// 		panic(err)
-			// 	}
-			// 	defer file.Close()
-			// 	file.Write([]byte(s))
-			//
-			//
+			// output the dotfile.
+			s := g.String()
+			file, err := os.Create(`../data/q57.dot`)
+			if err != nil {
+				panic(err)
+			}
+			defer file.Close()
+			file.Write([]byte(s))
 		}
 	}
-	// return
-	// }
-
 }
