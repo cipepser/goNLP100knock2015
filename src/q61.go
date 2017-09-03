@@ -20,10 +20,12 @@ func main() {
 		errors.New("please input artist name.")
 	}
 
-	res, err := redis.String(c.Do("GET", os.Args[1]))
-	if err != nil {
+	rep, err := redis.Strings(c.Do("LRANGE", os.Args[1], "0", "-1"))
+	if err != nil || len(rep) == 0 {
 		fmt.Println("`", os.Args[1], "` is not found.")
 	} else {
-		fmt.Println(res)
+		for _, r := range rep {
+			fmt.Println(r)
+		}
 	}
 }
