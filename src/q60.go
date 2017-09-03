@@ -74,6 +74,10 @@ func main() {
 			panic(err)
 		}
 
-		c.Do("SET", a.Name, a.Area)
+		_, err = c.Do("RPUSH", a.Name, a.Area)
+		if err != nil {
+			panic(err)
+		}
+
 	}
 }
