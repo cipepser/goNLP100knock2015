@@ -26,14 +26,18 @@ func main() {
 		panic(err)
 	}
 
+	// count up
 	cnt := 0
 	for _, k := range keys {
-		v, err := redis.Stringa(c.Do("GET", k))
+		rep, err := redis.Strings(c.Do("LRANGE", k, "0", "-1"))
 		if err != nil {
 			panic(err)
-		}
-		if v == "Japan" {
-			cnt++
+		} else {
+			for _, r := range rep {
+				if r == "Japan" {
+					cnt++
+				}
+			}
 		}
 	}
 
