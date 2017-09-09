@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"sort"
 
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -41,11 +42,6 @@ type Artist struct {
 }
 
 func main() {
-	// user input
-	name := "Queen"
-	aliasName := "Queen"
-	// tags := []string{"hard_rock"}
-
 	// connect to mongodb
 	session, err := mgo.Dial("mongodb://localhost")
 	if err != nil {
@@ -56,34 +52,16 @@ func main() {
 	db := session.DB("MusicBrainz")
 	col := db.C("artist")
 
-	// q := `"name":`
-	// query := col.Find(bson.M{"name": name})
-
-	// q := `"name": name, "aliases.name": aliasName, "tags.value": "related-akb48", "kamen rider w"`
-	q := bson.M{
-		"name":         name,
-		"aliases.name": aliasName,
-	}
-	// $and: [
-	// 	{"tags.value": "kamen rider w"},
-	// 	{"tags.value": "related-akb48"}
-	// ]
-
-	query := col.Find(q)
+	query := col.Find(bson.M{"tags.value": "dance"})
 
 	var artists []Artist
 	query.All(&artists)
 
-	for _, a := range artists {
-		// fmt.Println(a.Tags[0].Value)
-		fmt.Println(a)
-	}
+	sort.Slice(artists, func(i, j int) bool {
+		return artists[i].Rating.Count < artists[j].Rating.Count
+	})
 
-	// sort.Slice(artists, func(i, j int) bool {
-	// 	return artists[i].Rating.Count < artists[j].Rating.Count
-	// })
-	//
-	// for i := 0; i < 10; i++ {
-	// 	fmt.Println(artists[len(artists)-i-1].Name)
-	// }
+	for i := 0; i < 10; i++ {
+		fmt.Println(artists[len(artists)-i-1].Name)
+	}
 }
