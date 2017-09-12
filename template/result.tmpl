@@ -1,0 +1,36 @@
+<html>
+<h1>検索結果</h1>
+<table border="1">
+  <tr>
+    <th>アーティスト名</th>
+    <th>アーティストの別名</th>
+    <th>活動場所</th>
+    <th>性別</th>
+    <th>タグ</th>
+  </tr>
+
+  {{range .artists}}
+  <tr>
+    <td>{{.Name}}</td>
+    {{$len := len .Aliases}}
+    {{if gt $len 0}}
+    {{$a := index .Aliases 0}}
+
+    <td>{{$a.Name}}</td>
+    {{else}}
+    <td></td>
+    {{end}}
+
+    <td>{{.Area}}</td>
+
+    <td>{{.Gender}}</td>
+    <td>
+    {{range .Tags}}
+    <li>{{.Value}}</li>
+    {{end}}
+  </td>
+
+  </tr>
+  {{end}}
+</table>
+</html>
