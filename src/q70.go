@@ -8,6 +8,7 @@ import (
 	"math/rand"
 	"os"
 	"strings"
+	"time"
 )
 
 func main() {
@@ -55,6 +56,7 @@ func main() {
 
 	// shuffle sentences
 	sent := make([]string, len(sentiment))
+	rand.Seed(time.Now().UnixNano())
 	for i, n := range rand.Perm(len(sentiment)) {
 		sent[i] = sentiment[n]
 	}
