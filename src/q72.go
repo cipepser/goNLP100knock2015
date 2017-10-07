@@ -223,13 +223,15 @@ func main() {
 		panic(err)
 	}
 
-	// q74
-	fmt.Println("No.\tlabel\tprobability")
-	fmt.Println("------------------------------")
+	// q74, 76
+	fmt.Println("No.\tcorrect\tpredicted\tprobability")
+	fmt.Println("--------------------------------------------")
 	for i, x := range X[:10] {
 		ans, p := Predict(w, x)
-		fmt.Println("[", i, "]\t", ans, "\t", p)
+		fmt.Println("[", i, "]\t", labels[i], "\t", ans, "\t", p)
 	}
+
+	// q75
 
 	// q77
 	correct := 0
