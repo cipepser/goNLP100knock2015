@@ -172,13 +172,13 @@ func LogisticRegression(X []*mat.VecDense, labels []string, eta float64) (*mat.V
 	return w, nil
 }
 
-func Classify(w, x *mat.VecDense) string {
+func Predict(w, x *mat.VecDense) (string, float64) {
 	p := Sigmoid(mat.Dot(w, x))
 
 	if p > 0.5 {
-		return "+1"
+		return "+1", p
 	}
-	return "-1"
+	return "-1", p
 }
 
 func main() {
@@ -206,11 +206,12 @@ func main() {
 		rs = append(rs, r)
 	}
 
+	// q72
 	rs = PreProcessing(rs)
 	dict := makeDictionary(rs)
-
 	X := makeFeatureVectors(rs, dict)
 
+	// q73
 	labels := make([]string, len(rs))
 	for i, r := range rs {
 		labels[i] = r.label
@@ -222,9 +223,18 @@ func main() {
 		panic(err)
 	}
 
+	// q74
+	fmt.Println("No.\tlabel\tprobability")
+	fmt.Println("------------------------------")
+	for i, x := range X[:10] {
+		ans, p := Predict(w, x)
+		fmt.Println("[", i, "]\t", ans, "\t", p)
+	}
+
+	// q77
 	correct := 0
 	for i, x := range X {
-		ans := Classify(w, x)
+		ans, _ := Predict(w, x)
 
 		if ans == labels[i] {
 			correct++
