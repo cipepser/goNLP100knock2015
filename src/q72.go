@@ -230,6 +230,7 @@ func main() {
 	}
 
 	// q74, 76
+	fmt.Println("**** labeling and the probablity ****")
 	fmt.Println("No.\tcorrect\tpredicted\tprobability")
 	fmt.Println("--------------------------------------------")
 	for i, x := range X[:10] {
@@ -263,6 +264,7 @@ func main() {
 	for i := 0; i < 10; i++ {
 		fmt.Println("[", i, "]\t", features[i].word, "\t", features[i].weight)
 	}
+	fmt.Println("")
 
 	// q77
 	correct := 0
@@ -273,5 +275,5 @@ func main() {
 			correct++
 		}
 	}
-	fmt.Println(float64(correct) / float64(len(X)))
+	fmt.Println("accuracy rate: ", float64(correct)/float64(len(X)))
 }
