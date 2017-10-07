@@ -8,6 +8,7 @@ import (
 	"math"
 	"math/rand"
 	"os"
+	"sort"
 	"strings"
 
 	"gonum.org/v1/gonum/mat"
@@ -111,7 +112,7 @@ func makeDictionary(rs []Review) map[string]int {
 	return dict
 }
 
-func makeFeatureVectors(rs []Review, dict map[string]int) []*mat.VecDense {
+func makeFeatureVectors(rs []Review, dict map[string]int) ([]*mat.VecDense, []string) {
 	feature := make([]string, len(dict)+1)
 	i := 0
 	for w := range dict {
@@ -133,7 +134,7 @@ func makeFeatureVectors(rs []Review, dict map[string]int) []*mat.VecDense {
 		X[i] = mat.NewVecDense(len(x), x)
 	}
 
-	return X
+	return X, feature
 }
 
 // LogisticRegression returns w which is the weight vector by logistic regressin.
@@ -181,6 +182,11 @@ func Predict(w, x *mat.VecDense) (string, float64) {
 	return "-1", p
 }
 
+type Feature struct {
+	word   string
+	weight float64
+}
+
 func main() {
 	rs := []Review{}
 
@@ -209,7 +215,7 @@ func main() {
 	// q72
 	rs = PreProcessing(rs)
 	dict := makeDictionary(rs)
-	X := makeFeatureVectors(rs, dict)
+	X, feature := makeFeatureVectors(rs, dict)
 
 	// q73
 	labels := make([]string, len(rs))
@@ -230,8 +236,33 @@ func main() {
 		ans, p := Predict(w, x)
 		fmt.Println("[", i, "]\t", labels[i], "\t", ans, "\t", p)
 	}
+	fmt.Println("")
 
 	// q75
+	features := make([]Feature, w.Len())
+	for i := 0; i < w.Len(); i++ {
+		features[i].weight = w.At(i, 0)
+		features[i].word = feature[i]
+	}
+
+	sort.Slice(features, func(i, j int) bool {
+		return features[i].weight < features[j].weight
+	})
+
+	fmt.Println("**** 10 highest weighted words ****")
+	fmt.Println("rank\tword\tweight")
+	fmt.Println("--------------------------------------------")
+	for i := 0; i < 10; i++ {
+		fmt.Println("[", i, "]\t", features[len(features)-i-1].word,
+			"\t", features[len(features)-i-1].weight)
+	}
+	fmt.Println("")
+	fmt.Println("**** 10 lowest weighted words ****")
+	fmt.Println("rank\tword\tweight")
+	fmt.Println("--------------------------------------------")
+	for i := 0; i < 10; i++ {
+		fmt.Println("[", i, "]\t", features[i].word, "\t", features[i].weight)
+	}
 
 	// q77
 	correct := 0
