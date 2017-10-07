@@ -2,9 +2,11 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"io"
 	"math"
+	"math/rand"
 	"os"
 	"strings"
 
@@ -134,51 +136,50 @@ func makeFeatureVectors(rs []Review, dict map[string]int) []*mat.VecDense {
 	return X
 }
 
-//
-// func Training(X [][]string, label[]string) (*mat.VecDense, error) {
-//   if len(X) != len(label) {
-//     return nil, errors.New("X and label must have same length.")
-//   }
-//
-//   // correct label
-//   t := make([]float64, len(X))
-//   for i, l := range labels {
-//     if l == "+1" {
-//       t[i] = 1.0
-//     }
-//   }
-//   // initialize the parameter
-//   ws := make([]float64, len(feature))
-//   for i := range ws {
-//     ws[i] = rand.Float64()
-//   }
-//   w := mat.NewVecDense(len(ws), ws)
-//
-//   // training
-//   eta := 0.6
-//   for i := range X {
-//     x := mat.NewVecDense(len(X[i]), X[i])
-//
-//     p := Sigmoid(mat.Dot(w, x))
-//
-//     x.ScaleVec(eta*(p-t[i]), x)
-//     w.SubVec(w, x)
-//
-//     eta *= 0.99999
-//   }
-//
-//
-//   return w, nil
-// }
+// LogisticRegression returns w which is the weight vector by logistic regressin.
+func LogisticRegression(X []*mat.VecDense, labels []string, eta float64) (*mat.VecDense, error) {
+	if len(X) != len(labels) {
+		return nil, errors.New("X and label must have same length.")
+	}
 
-// func Classify(w, x *mat.VecDense) string {
-//   p := Sigmoid(mat.Dot(w, x))
-//
-//   if p > 0.5 {
-//     return "+1"
-//   }
-//   return "-1"
-// }
+	// correct label
+	t := make([]float64, len(X))
+	for i, l := range labels {
+		if l == "+1" {
+			t[i] = 1.0
+		}
+	}
+	// initialize the parameter
+	ws := make([]float64, X[0].Len())
+	for i := range ws {
+		ws[i] = rand.Float64()
+	}
+	w := mat.NewVecDense(len(ws), ws)
+
+	// training
+	for i := range X {
+		x := mat.NewVecDense(X[i].Len(), nil)
+		x.CopyVec(X[i])
+
+		p := Sigmoid(mat.Dot(w, x))
+
+		x.ScaleVec(eta*(p-t[i]), x)
+		w.SubVec(w, x)
+
+		eta *= 0.99999
+	}
+
+	return w, nil
+}
+
+func Classify(w, x *mat.VecDense) string {
+	p := Sigmoid(mat.Dot(w, x))
+
+	if p > 0.5 {
+		return "+1"
+	}
+	return "-1"
+}
 
 func main() {
 	rs := []Review{}
@@ -210,16 +211,24 @@ func main() {
 
 	X := makeFeatureVectors(rs, dict)
 
-	fmt.Println(X[1])
+	labels := make([]string, len(rs))
+	for i, r := range rs {
+		labels[i] = r.label
+	}
 
-	// correct := 0
-	// for i := range X {
-	// 	x := mat.NewVecDense(len(X[i]), X[i])
-	//   l = Classify(w, x)
-	//
-	// 	if t[i] == label {
-	// 		correct++
-	// 	}
-	// }
-	// fmt.Println(float64(correct) / float64(len(X)))
+	eta := 0.6
+	w, err := LogisticRegression(X, labels, eta)
+	if err != nil {
+		panic(err)
+	}
+
+	correct := 0
+	for i, x := range X {
+		ans := Classify(w, x)
+
+		if ans == labels[i] {
+			correct++
+		}
+	}
+	fmt.Println(float64(correct) / float64(len(X)))
 }
