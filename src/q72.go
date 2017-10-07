@@ -102,11 +102,11 @@ func makeDictionary(rs []Review) map[string]int {
 	}
 
 	// remove noise
-	for w := range dict {
-		if dict[w] < 6 {
-			delete(dict, w)
-		}
-	}
+	// for w := range dict {
+	// 	if dict[w] < 6 {
+	// 		delete(dict, w)
+	// 	}
+	// }
 
 	return dict
 }
