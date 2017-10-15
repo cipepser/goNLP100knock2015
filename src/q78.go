@@ -228,8 +228,7 @@ func main() {
 
 	rs = PreProcessing(rs)
 	dict := makeDictionary(rs)
-	X, feature := makeFeatureVectors(rs, dict)
-
+	X, _ := makeFeatureVectors(rs, dict)
 	labels := make([]string, len(rs))
 	for i, r := range rs {
 		labels[i] = r.label
@@ -237,11 +236,34 @@ func main() {
 
 	// split the data X to training data and test data.
 	Xs, lss := Divide(X, labels, 5)
-	// lss := Divide(labels, 5)
 	eta := 0.6
 
 	for i := range Xs {
-		w, err := LogisticRegression(X, labels, eta)
+		trainingData := []*mat.VecDense{}
+		for _, xs := range Xs[:i] {
+			for _, x := range xs {
+				trainingData = append(trainingData, x)
+			}
+		}
+		for _, xs := range Xs[i+1 : len(Xs)] {
+			for _, x := range xs {
+				trainingData = append(trainingData, x)
+			}
+		}
+
+		trainingLabel := []string{}
+		for _, ls := range lss[:i] {
+			for _, l := range ls {
+				trainingLabel = append(trainingLabel, l)
+			}
+		}
+		for _, ls := range lss[i+1 : len(lss)] {
+			for _, l := range ls {
+				trainingLabel = append(trainingLabel, l)
+			}
+		}
+
+		w, err := LogisticRegression(trainingData, trainingLabel, eta)
 		if err != nil {
 			panic(err)
 		}
@@ -251,27 +273,28 @@ func main() {
 		prePos := 0
 		andPos := 0
 
-		for i, x := range X {
+		for j, x := range Xs[i] {
+			ls := lss[i]
 			ans, _ := Predict(w, x)
 
-			if ans == labels[i] {
+			if ans == ls[j] {
 				correct++
 			}
 
-			if labels[i] == "+1" {
+			if ls[j] == "+1" {
 				actPos++
 			}
 			if ans == "+1" {
 				prePos++
 			}
 
-			if labels[i] == "+1" && ans == "+1" {
+			if ls[j] == "+1" && ans == "+1" {
 				andPos++
 			}
 		}
 
-		fmt.Println("**** rates ****")
-		fmt.Println("accuracy rate:\t", float64(correct)/float64(len(X)))
+		fmt.Println("**** rates (", i, "/", len(Xs), ") ****")
+		fmt.Println("accuracy rate:\t", float64(correct)/float64(len(Xs[i])))
 
 		preRate := float64(andPos) / float64(prePos)
 		fmt.Println("precision rate:\t", preRate)
@@ -280,7 +303,7 @@ func main() {
 		fmt.Println("recall rate:\t", recRate)
 
 		fmt.Println("F1 score:\t", 2*(preRate*recRate)/(preRate+recRate))
-
+		fmt.Println("")
 	}
 
 }
