@@ -16,15 +16,16 @@ func removeSymbol(s string) string {
 	noise := []string{".", ",", "!", "?", ";", ":", "(", ")", "[", "]", "'", "\""}
 
 	for _, v := range noise {
-		for string(s[0]) == v {
+		if string(s[0]) == v {
 			s = strings.TrimPrefix(s, v)
+			s = removeSymbol(s)
 			if len(s) == 0 {
 				return s
 			}
 		}
-		// fmt.Println(s)
-		for string(s[len(s)-1]) == v {
+		if string(s[len(s)-1]) == v {
 			s = strings.TrimSuffix(s, v)
+			s = removeSymbol(s)
 			if len(s) == 0 {
 				return s
 			}
@@ -76,9 +77,11 @@ func main() {
 	defer fw.Close()
 
 	for _, ts := range corpus {
-		for _, t := range ts {
+		for i, t := range ts {
 			fw.Write([]byte(t))
-			fw.Write([]byte(string(' ')))
+			if i != len(ts)-1 {
+				fw.Write([]byte(string(' ')))
+			}
 		}
 		fw.Write([]byte("\n"))
 	}
