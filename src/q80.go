@@ -35,7 +35,7 @@ func removeSymbol(s string) string {
 }
 
 func main() {
-	f, err := os.Open("../data/enwiki-20150112-400-r100-10576.tmp.txt")
+	f, err := os.Open("../data/enwiki-20150112-400-r100-10576.txt")
 	defer f.Close()
 	if err != nil {
 		panic(err)
@@ -64,10 +64,6 @@ func main() {
 			corpus = append(corpus, c)
 		}
 	}
-
-	// for _, c := range corpus {
-	// 	fmt.Println(c)
-	// }
 
 	// write the result to txt file
 	fw, err := os.Create("../data/q80.out.txt")
