@@ -9,6 +9,7 @@ import (
 	"math"
 	"os"
 	"strings"
+	"time"
 
 	"gonum.org/v1/gonum/mat"
 
@@ -40,6 +41,10 @@ func calcPPMI(N, tc, t, c int) float64 {
 }
 
 func main() {
+	fmt.Println("start")
+	fmt.Println(time.Now().Format("2006/01/02 15:04:05 JST"))
+
+	fmt.Println("read file")
 	f, err := os.Open("../data/q82_tmp.out.txt")
 	defer f.Close()
 	if err != nil {
@@ -69,16 +74,20 @@ func main() {
 		Nt[k.t]++
 		Nc[k.c]++
 	}
+	fmt.Println(time.Now().Format("2006/01/02 15:04:05 JST"))
 
+	fmt.Println("calc PPMI")
 	X := make(map[key]float64)
 	for k := range m {
 		X[k] = calcPPMI(len(m), m[k], Nt[k.t], Nc[k.t])
 	}
+	fmt.Println(time.Now().Format("2006/01/02 15:04:05 JST"))
 
 	fmt.Println("the number of the word: ", len(Nt))
 	fmt.Println("the number of contex word: ", len(Nc))
 
 	// transform hashmap to matrix
+	fmt.Println("re-order idxt")
 	idxt := make(map[int]string)
 	dict := make(map[string]int)
 	i := 0
@@ -87,14 +96,18 @@ func main() {
 		dict[k] = i
 		i++
 	}
+	fmt.Println(time.Now().Format("2006/01/02 15:04:05 JST"))
 
+	fmt.Println("re-order idxc")
 	idxc := make(map[int]string)
 	j := 0
 	for k := range Nc {
 		idxc[j] = k
 		j++
 	}
+	fmt.Println(time.Now().Format("2006/01/02 15:04:05 JST"))
 
+	fmt.Println("store the data as CSR")
 	// ja = make([]int, len(X))
 	data := []float64{}
 	// ia := []int{}
@@ -116,6 +129,7 @@ func main() {
 		ia[i+1] = cnt
 
 	}
+	fmt.Println(time.Now().Format("2006/01/02 15:04:05 JST"))
 
 	// ia[len(ia)-1] = len(data)
 
@@ -130,7 +144,9 @@ func main() {
 	// ia := []int{0, 2, 4, 6, len(data)}
 	// ja := []int{0, 1, 0, 3, 2, 3, 0, 3}
 
+	fmt.Println("new CSR")
 	y := sparse.NewCSR(len(Nt), len(Nc), ia, ja, data)
+	fmt.Println(time.Now().Format("2006/01/02 15:04:05 JST"))
 	// _ = y
 	//
 	//
@@ -158,6 +174,7 @@ func main() {
 		log.Fatal("PCA fails")
 	}
 
+	fmt.Println(time.Now().Format("2006/01/02 15:04:05 JST"))
 	fmt.Println("PCA finshed!!")
 
 	k := 300
@@ -178,6 +195,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	fmt.Println(time.Now().Format("2006/01/02 15:04:05 JST"))
 
 	fmt.Println("save dict...")
 	fwd, err := os.Create("../data/q85.dict.txt")
@@ -192,5 +210,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	fmt.Println(time.Now().Format("2006/01/02 15:04:05 JST"))
 
 }
