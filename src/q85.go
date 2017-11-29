@@ -17,6 +17,10 @@ import (
 	"gonum.org/v1/gonum/stat"
 )
 
+const (
+	myTimeFormat = "2006/01/02 15:04:05 JST"
+)
+
 type key struct {
 	t, c string
 }
@@ -42,7 +46,7 @@ func calcPPMI(N, tc, t, c int) float64 {
 
 func main() {
 	fmt.Println("start")
-	fmt.Println(time.Now().Format("2006/01/02 15:04:05 JST"))
+	fmt.Println(time.Now().Format(myTimeFormat))
 
 	fmt.Println("read file")
 	f, err := os.Open("../data/q82_tmp.out.txt")
@@ -74,14 +78,17 @@ func main() {
 		Nt[k.t]++
 		Nc[k.c]++
 	}
-	fmt.Println(time.Now().Format("2006/01/02 15:04:05 JST"))
+	fmt.Println(time.Now().Format(myTimeFormat))
 
 	fmt.Println("calc PPMI")
 	X := make(map[key]float64)
 	for k := range m {
-		X[k] = calcPPMI(len(m), m[k], Nt[k.t], Nc[k.t])
+		ppmi := calcPPMI(len(m), m[k], Nt[k.t], Nc[k.t])
+		if ppmi > 0 {
+			X[k] = ppmi
+		}
 	}
-	fmt.Println(time.Now().Format("2006/01/02 15:04:05 JST"))
+	fmt.Println(time.Now().Format(myTimeFormat))
 
 	fmt.Println("the number of the word: ", len(Nt))
 	fmt.Println("the number of contex word: ", len(Nc))
@@ -89,25 +96,34 @@ func main() {
 	// transform hashmap to matrix
 	fmt.Println("re-order idxt")
 	idxt := make(map[int]string)
-	dict := make(map[string]int)
+	dictt := make(map[string]int)
 	i := 0
 	for k := range Nt {
 		idxt[i] = k
-		dict[k] = i
+		dictt[k] = i
 		i++
 	}
-	fmt.Println(time.Now().Format("2006/01/02 15:04:05 JST"))
+	fmt.Println(time.Now().Format(myTimeFormat))
 
 	fmt.Println("re-order idxc")
 	idxc := make(map[int]string)
+	dictc := make(map[string]int)
 	j := 0
 	for k := range Nc {
 		idxc[j] = k
+		dictc[k] = j
 		j++
 	}
-	fmt.Println(time.Now().Format("2006/01/02 15:04:05 JST"))
+	fmt.Println(time.Now().Format(myTimeFormat))
 
-	fmt.Println("store the data as CSR")
+	fmt.Println("store data as a CSR")
+	// TODO: 高速化
+
+	fmt.Println(len(X))
+	for k, v := range X {
+		fmt.Println("(", dictt[k.t], ",", dictc[k.c], "): ", v)
+	}
+
 	// ja = make([]int, len(X))
 	data := []float64{}
 	// ia := []int{}
@@ -129,42 +145,12 @@ func main() {
 		ia[i+1] = cnt
 
 	}
-	fmt.Println(time.Now().Format("2006/01/02 15:04:05 JST"))
-
-	// ia[len(ia)-1] = len(data)
-
-	// fmt.Println(len(ia))
-	// fmt.Println(len(ja))
-	//
-	// fmt.Println(ia)
-	// fmt.Println(ja)
-
-	// data := []float64{3, 1, 1, 2, 1, 2, 1, 4}
-	//
-	// ia := []int{0, 2, 4, 6, len(data)}
-	// ja := []int{0, 1, 0, 3, 2, 3, 0, 3}
+	fmt.Println(time.Now().Format(myTimeFormat))
 
 	fmt.Println("new CSR")
+	// TODO: NewDenseされてmakesliceのout of rangeになる
 	y := sparse.NewCSR(len(Nt), len(Nc), ia, ja, data)
-	fmt.Println(time.Now().Format("2006/01/02 15:04:05 JST"))
-	// _ = y
-	//
-	//
-	//
-
-	// fmt.Println(y.Dims())
-
-	// y := mat.NewDense(len(Nt), len(Nc), nil)
-	// for i := 0; i < len(Nt)-1; i++ {
-	// 	for j := 0; j < len(Nc)-1; j++ {
-	// 		k := key{
-	// 			t: idxt[i],
-	// 			c: idxc[j],
-	// 		}
-	// 		y.Set(i, j, X[k])
-	// 	}
-	// }
-	//
+	fmt.Println(time.Now().Format(myTimeFormat))
 
 	// PCA
 	fmt.Println("PCA start...")
@@ -174,7 +160,7 @@ func main() {
 		log.Fatal("PCA fails")
 	}
 
-	fmt.Println(time.Now().Format("2006/01/02 15:04:05 JST"))
+	fmt.Println(time.Now().Format(myTimeFormat))
 	fmt.Println("PCA finshed!!")
 
 	k := 300
@@ -195,10 +181,10 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(time.Now().Format("2006/01/02 15:04:05 JST"))
+	fmt.Println(time.Now().Format(myTimeFormat))
 
-	fmt.Println("save dict...")
-	fwd, err := os.Create("../data/q85.dict.txt")
+	fmt.Println("save dictt...")
+	fwd, err := os.Create("../data/q85.dictt.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -206,10 +192,25 @@ func main() {
 
 	enc = gob.NewEncoder(fwd)
 
-	err = enc.Encode(dict)
+	err = enc.Encode(dictt)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(time.Now().Format("2006/01/02 15:04:05 JST"))
+	fmt.Println(time.Now().Format(myTimeFormat))
+
+	fmt.Println("save dictc...")
+	fwdc, err := os.Create("../data/q85.dictc.txt")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer fwd.Close()
+
+	enc = gob.NewEncoder(fwdc)
+
+	err = enc.Encode(dictc)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(time.Now().Format(myTimeFormat))
 
 }
