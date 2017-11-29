@@ -116,39 +116,48 @@ func main() {
 	}
 	fmt.Println(time.Now().Format(myTimeFormat))
 
-	fmt.Println("store data as a CSR")
+	fmt.Println("store data as a COO")
 	// TODO: 高速化
-
-	fmt.Println(len(X))
-	for k, v := range X {
-		fmt.Println("(", dictt[k.t], ",", dictc[k.c], "): ", v)
-	}
 
 	// ja = make([]int, len(X))
 	data := []float64{}
 	// ia := []int{}
-	ia := make([]int, len(Nt)+1)
-	ja := []int{}
-	cnt := 0
-	for i := 0; i < len(Nt); i++ {
-		for j := 0; j < len(Nc); j++ {
-			k := key{
-				t: idxt[i],
-				c: idxc[j],
-			}
-			if X[k] > 0 {
-				data = append(data, X[k])
-				ja = append(ja, j)
-				cnt++
-			}
-		}
-		ia[i+1] = cnt
+	data := make([]float64, len(X))
+	ia := make([]int, len(X))
+	ja := make([]int, len(X))
+	// ja := []int{}
+	// cnt := 0
+	
+	i := 0
+	for k, v := range X {
+		fmt.Println("(", , ",", dictc[k.c], "): ", v)
+		data[i] = v
+		ia[i] = dictt[k.t]
+		ja[i] = dictc[k.c]
+		// cnt++
+		i++
+	}
+
+	// for i := 0; i < len(Nt); i++ {
+	// 	for j := 0; j < len(Nc); j++ {
+	// 		k := key{
+	// 			t: idxt[i],
+	// 			c: idxc[j],
+	// 		}
+	// 		if X[k] > 0 {
+	// 			data = append(data, X[k])
+	// 			ja = append(ja, j)
+	// 			cnt++
+	// 		}
+	// 	}
+	// 	ia[i+1] = cnt
 	}
 	fmt.Println(time.Now().Format(myTimeFormat))
 
-	fmt.Println("new CSR")
+	fmt.Println("new COO")
 	// TODO: NewDenseされてmakesliceのout of rangeになる
-	y := sparse.NewCSR(len(Nt), len(Nc), ia, ja, data)
+	// y := sparse.NewCSR(len(Nt), len(Nc), ia, ja, data)
+	y := sparse.NewCOO(len(Nt), len(Nc), ia, ja, data)
 	fmt.Println(time.Now().Format(myTimeFormat))
 
 	// PCA
