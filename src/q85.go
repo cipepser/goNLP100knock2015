@@ -143,7 +143,6 @@ func main() {
 			}
 		}
 		ia[i+1] = cnt
-
 	}
 	fmt.Println(time.Now().Format(myTimeFormat))
 
