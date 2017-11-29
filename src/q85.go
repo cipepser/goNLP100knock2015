@@ -49,7 +49,7 @@ func main() {
 	fmt.Println(time.Now().Format(myTimeFormat))
 
 	fmt.Println("read file")
-	f, err := os.Open("../data/q82_tmp.out.txt")
+	f, err := os.Open("../data/q82.out.txt")
 	defer f.Close()
 	if err != nil {
 		panic(err)
@@ -117,41 +117,19 @@ func main() {
 	fmt.Println(time.Now().Format(myTimeFormat))
 
 	fmt.Println("store data as a COO")
-	// TODO: 高速化
 
-	// ja = make([]int, len(X))
-	data := []float64{}
-	// ia := []int{}
 	data := make([]float64, len(X))
 	ia := make([]int, len(X))
 	ja := make([]int, len(X))
-	// ja := []int{}
-	// cnt := 0
-	
-	i := 0
+
+	i = 0
 	for k, v := range X {
-		fmt.Println("(", , ",", dictc[k.c], "): ", v)
 		data[i] = v
 		ia[i] = dictt[k.t]
 		ja[i] = dictc[k.c]
-		// cnt++
 		i++
 	}
 
-	// for i := 0; i < len(Nt); i++ {
-	// 	for j := 0; j < len(Nc); j++ {
-	// 		k := key{
-	// 			t: idxt[i],
-	// 			c: idxc[j],
-	// 		}
-	// 		if X[k] > 0 {
-	// 			data = append(data, X[k])
-	// 			ja = append(ja, j)
-	// 			cnt++
-	// 		}
-	// 	}
-	// 	ia[i+1] = cnt
-	}
 	fmt.Println(time.Now().Format(myTimeFormat))
 
 	fmt.Println("new COO")
