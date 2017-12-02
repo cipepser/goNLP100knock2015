@@ -49,7 +49,7 @@ func main() {
 	fmt.Println(time.Now().Format(myTimeFormat))
 
 	fmt.Println("read file")
-	f, err := os.Open("../data/q82.out.txt")
+	f, err := os.Open("../data/q82_tmp.out.txt")
 	defer f.Close()
 	if err != nil {
 		panic(err)
@@ -83,7 +83,7 @@ func main() {
 	fmt.Println("calc PPMI")
 	X := make(map[key]float64)
 	for k := range m {
-		ppmi := calcPPMI(len(m), m[k], Nt[k.t], Nc[k.t])
+		ppmi := calcPPMI(len(m), m[k], Nt[k.t], Nc[k.c])
 		if ppmi > 0 {
 			X[k] = ppmi
 		}
