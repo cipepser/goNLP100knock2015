@@ -80,6 +80,20 @@ func main() {
 	}
 	fmt.Println(time.Now().Format(myTimeFormat))
 
+	tmp := make(map[string]int)
+	for k := range Nt {
+		tmp[k]++
+	}
+	for k := range Nc {
+		tmp[k]++
+	}
+	for k, v := range tmp {
+		if v == 1 {
+			fmt.Println(k)
+		}
+	}
+	// fmt.Println(tmp)
+
 	fmt.Println("calc PPMI")
 	X := make(map[key]float64)
 	for k := range m {
@@ -133,7 +147,6 @@ func main() {
 	fmt.Println(time.Now().Format(myTimeFormat))
 
 	fmt.Println("new COO")
-	// TODO: NewDenseされてmakesliceのout of rangeになる
 	// y := sparse.NewCSR(len(Nt), len(Nc), ia, ja, data)
 	y := sparse.NewCOO(len(Nt), len(Nc), ia, ja, data)
 	fmt.Println(time.Now().Format(myTimeFormat))
@@ -141,6 +154,7 @@ func main() {
 	// PCA
 	fmt.Println("PCA start...")
 	var pc stat.PC
+	// TODO: NewDenseされてmakesliceのout of rangeになる
 	ok := pc.PrincipalComponents(y, nil)
 	if !ok {
 		log.Fatal("PCA fails")
@@ -148,6 +162,8 @@ func main() {
 
 	fmt.Println(time.Now().Format(myTimeFormat))
 	fmt.Println("PCA finshed!!")
+	// eig := make([]float64, len(Nt))
+	// fmt.Println(pc.VarsTo(eig))
 
 	k := 300
 	var proj mat.Dense
