@@ -2,3 +2,4 @@ data/*
 src/barchart.*
 .DS_Store
 stanford-corenlp-full-2017-06-09
+tmp/
