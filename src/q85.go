@@ -11,14 +11,13 @@ import (
 	"strings"
 	"time"
 
-	"gonum.org/v1/gonum/mat"
-
 	"github.com/james-bowman/sparse"
+	"gonum.org/v1/gonum/mat"
 	"gonum.org/v1/gonum/stat"
 )
 
 const (
-	myTimeFormat = "2006/01/02 15:04:05 JST"
+	myTimeFormat = "2006/01/02 15:04:05 JST" // to display progress status
 )
 
 type key struct {
@@ -45,10 +44,7 @@ func calcPPMI(N, tc, t, c int) float64 {
 }
 
 func main() {
-	fmt.Println("start")
-	fmt.Println(time.Now().Format(myTimeFormat))
-
-	fmt.Println("read file")
+	fmt.Println("read file:", time.Now().Format(myTimeFormat))
 	f, err := os.Open("../data/q82_tmp.out.txt")
 	defer f.Close()
 	if err != nil {
@@ -78,23 +74,9 @@ func main() {
 		Nt[k.t]++
 		Nc[k.c]++
 	}
-	fmt.Println(time.Now().Format(myTimeFormat))
+	fmt.Println("\tfinished:", time.Now().Format(myTimeFormat))
 
-	tmp := make(map[string]int)
-	for k := range Nt {
-		tmp[k]++
-	}
-	for k := range Nc {
-		tmp[k]++
-	}
-	for k, v := range tmp {
-		if v == 1 {
-			fmt.Println(k)
-		}
-	}
-	// fmt.Println(tmp)
-
-	fmt.Println("calc PPMI")
+	fmt.Println("calculate PPMI:", time.Now().Format(myTimeFormat))
 	X := make(map[key]float64)
 	for k := range m {
 		ppmi := calcPPMI(len(m), m[k], Nt[k.t], Nc[k.c])
@@ -102,13 +84,13 @@ func main() {
 			X[k] = ppmi
 		}
 	}
-	fmt.Println(time.Now().Format(myTimeFormat))
+	fmt.Println("\tfinished:", time.Now().Format(myTimeFormat))
+	fmt.Println("\tthe number of the word:", len(Nt))
+	fmt.Println("\tthe number of contex word: ", len(Nc))
+	fmt.Println("\tfinished:", time.Now().Format(myTimeFormat))
 
-	fmt.Println("the number of the word: ", len(Nt))
-	fmt.Println("the number of contex word: ", len(Nc))
-
-	// transform hashmap to matrix
-	fmt.Println("re-order idxt")
+	fmt.Println("transform hashmap to matrix:", time.Now().Format(myTimeFormat))
+	fmt.Println("\tre-order idxt:", time.Now().Format(myTimeFormat))
 	idxt := make(map[int]string)
 	dictt := make(map[string]int)
 	i := 0
@@ -117,9 +99,8 @@ func main() {
 		dictt[k] = i
 		i++
 	}
-	fmt.Println(time.Now().Format(myTimeFormat))
 
-	fmt.Println("re-order idxc")
+	fmt.Println("\tre-order idxc:", time.Now().Format(myTimeFormat))
 	idxc := make(map[int]string)
 	dictc := make(map[string]int)
 	j := 0
@@ -128,10 +109,8 @@ func main() {
 		dictc[k] = j
 		j++
 	}
-	fmt.Println(time.Now().Format(myTimeFormat))
 
-	fmt.Println("store data as a COO")
-
+	fmt.Println("\tstore data as COO:", time.Now().Format(myTimeFormat))
 	data := make([]float64, len(X))
 	ia := make([]int, len(X))
 	ja := make([]int, len(X))
@@ -143,34 +122,32 @@ func main() {
 		ja[i] = dictc[k.c]
 		i++
 	}
-
-	fmt.Println(time.Now().Format(myTimeFormat))
-
-	fmt.Println("new COO")
 	// y := sparse.NewCSR(len(Nt), len(Nc), ia, ja, data)
 	y := sparse.NewCOO(len(Nt), len(Nc), ia, ja, data)
-	fmt.Println(time.Now().Format(myTimeFormat))
+	fmt.Println("\tfinished:", time.Now().Format(myTimeFormat))
+	_ = y
 
-	// PCA
-	fmt.Println("PCA start...")
+	fmt.Println("PCA start:", time.Now().Format(myTimeFormat))
+
 	var pc stat.PC
-	// TODO: NewDenseされてmakesliceのout of rangeになる
+	// // TODO: NewDenseされてmakesliceのout of rangeになる
 	ok := pc.PrincipalComponents(y, nil)
 	if !ok {
 		log.Fatal("PCA fails")
 	}
 
 	fmt.Println(time.Now().Format(myTimeFormat))
-	fmt.Println("PCA finshed!!")
+	fmt.Println("\tfinished:", time.Now().Format(myTimeFormat))
 	// eig := make([]float64, len(Nt))
 	// fmt.Println(pc.VarsTo(eig))
 
+	fmt.Println("project to 300 dimensions:", time.Now().Format(myTimeFormat))
 	k := 300
 	var proj mat.Dense
 	proj.Mul(y, pc.VectorsTo(nil).Slice(0, len(Nc), 0, k))
+	fmt.Println("\tfinished:", time.Now().Format(myTimeFormat))
 
-	fmt.Println("save proj...")
-	// save the result
+	fmt.Println("save proj:", time.Now().Format(myTimeFormat))
 	fwp, err := os.Create("../data/q85.proj.txt")
 	if err != nil {
 		log.Fatal(err)
@@ -178,14 +155,13 @@ func main() {
 	defer fwp.Close()
 
 	enc := gob.NewEncoder(fwp)
-
 	err = enc.Encode(proj)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(time.Now().Format(myTimeFormat))
+	fmt.Println("\tfinished:", time.Now().Format(myTimeFormat))
 
-	fmt.Println("save dictt...")
+	fmt.Println("save dictt:", time.Now().Format(myTimeFormat))
 	fwd, err := os.Create("../data/q85.dictt.txt")
 	if err != nil {
 		log.Fatal(err)
@@ -193,14 +169,13 @@ func main() {
 	defer fwd.Close()
 
 	enc = gob.NewEncoder(fwd)
-
 	err = enc.Encode(dictt)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(time.Now().Format(myTimeFormat))
+	fmt.Println("\tfinished:", time.Now().Format(myTimeFormat))
 
-	fmt.Println("save dictc...")
+	fmt.Println("save dictc", , time.Now().Format(myTimeFormat))
 	fwdc, err := os.Create("../data/q85.dictc.txt")
 	if err != nil {
 		log.Fatal(err)
@@ -208,11 +183,9 @@ func main() {
 	defer fwd.Close()
 
 	enc = gob.NewEncoder(fwdc)
-
 	err = enc.Encode(dictc)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(time.Now().Format(myTimeFormat))
-
+	fmt.Println("\tfinished:", time.Now().Format(myTimeFormat))
 }
