@@ -40,8 +40,7 @@ func main() {
 	}
 
 	v1 := proj.RowView(dict["United_States"])
-	// v2 := proj.RowView(dict["U.S"])
-	v2 := proj.RowView(94) // 今のPCA結果では、U.Sが零ベクトルのため代理
+	v2 := proj.RowView(dict["U.S"])
 
 	fmt.Println(cos(v1, v2))
 }
