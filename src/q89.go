@@ -45,13 +45,9 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// 94, 130, 249 // 今のPCA結果では、零ベクトルのため代理
 	vSpain := mat.NewVecDense(len(proj.RawRowView(dict["Spain"])), proj.RawRowView(dict["Spain"]))
 	vMadrid := mat.NewVecDense(len(proj.RawRowView(dict["Madrid"])), proj.RawRowView(dict["Madrid"]))
 	vAthens := mat.NewVecDense(len(proj.RawRowView(dict["Athens"])), proj.RawRowView(dict["Athens"]))
-	// vSpain := mat.NewVecDense(len(proj.RawRowView(94)), proj.RawRowView(94))
-	// vMadrid := mat.NewVecDense(len(proj.RawRowView(130)), proj.RawRowView(130))
-	// vAthens := mat.NewVecDense(len(proj.RawRowView(249)), proj.RawRowView(249))
 
 	vTarget := new(mat.VecDense)
 	vTarget.SubVec(vSpain, vMadrid)
