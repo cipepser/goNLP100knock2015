@@ -45,10 +45,9 @@ func main() {
 		log.Fatal(err)
 	}
 
-	idxEngland := dict["England"]
-	// idxEngland := dict["United_States"] // 今のPCA結果では、U.Sが零ベクトルのため代理
+	// idxEngland := dict["England"]
+	idxEngland := dict["United_States"] // 今のPCA結果では、Englandが零ベクトルのため代理
 	vEngland := proj.RowView(idxEngland)
-	fmt.Println(vEngland)
 
 	css := make([]CosineSimilarity, 0)
 	for w, i := range dict {
