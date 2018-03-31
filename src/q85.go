@@ -138,8 +138,6 @@ func main() {
 
 	fmt.Println(time.Now().Format(myTimeFormat))
 	fmt.Println("\tfinished:", time.Now().Format(myTimeFormat))
-	// eig := make([]float64, len(Nt))
-	// fmt.Println(pc.VarsTo(eig))
 
 	fmt.Println("project to 300 dimensions:", time.Now().Format(myTimeFormat))
 	k := 300
@@ -175,7 +173,7 @@ func main() {
 	}
 	fmt.Println("\tfinished:", time.Now().Format(myTimeFormat))
 
-	fmt.Println("save dictc", , time.Now().Format(myTimeFormat))
+	fmt.Println("save dictc", time.Now().Format(myTimeFormat))
 	fwdc, err := os.Create("../data/q85.dictc.txt")
 	if err != nil {
 		log.Fatal(err)
